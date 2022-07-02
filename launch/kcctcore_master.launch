@@ -1,17 +1,24 @@
 <launch>
 	<arg name="sim" default="false" />
     <arg name="map_2d" default="false" />
-    <arg name="waypoint_file" default="$(find kcctcore)/config/waypointdata/lab.csv"/>
-    <arg name="map_pcd" default="$(find kcctcore)/config/pcd/lab.pcd" />
+    <arg name="waypoint_file" default="$(find kcctcore)/config/waypointdata/wpdata.csv"/>
     <arg name="world_name" default="$(find kcctsim)/worlds/autoware.world"/>
+    <arg name="map_pcd" default="$(find kcctcore)/config/pcd/PointCloudMap2022-1-24-3-21.pcd" />
     <arg name="map_2d_file" default="$(find kcctcore)/config/map/sim1.yaml" />
     <arg name="use_hdl_localization" default="true" />
     <arg name="waypoint_marking" default="false"/>
-    <arg name="object_avoidance" default="true"/>
-    <arg name="endless" default="false"/>
+    <arg name="offset_x" default="506192.923759" />
+    <arg name="offset_y" default="3837565.22851" />
+    <arg name="offset_z" default="158.6" />
+    <!--offset取り方、waypoint.launch起動してrostopic echo /gpsodom-->
 
 
-    <include file="$(find kcctcore)/launch/include/localization.launch">
+    <!--<include file="$(find kcctcore)/launch/include/localization.launch">-->    <!--3D LiDAR mode-->
+    <include file="$(find kcctgnss)/launch/localization.launch">     <!--GPS mode-->
+        <arg name="offset_x" value="$(arg offset_x)"/>
+        <arg name="offset_y" value="$(arg offset_y)"/>
+        <arg name="offset_z" value="$(arg offset_z)"/>
+        
         <arg name="sim" default="$(arg sim)" />
         <arg name="map_2d" default="$(arg map_2d)" />
         <arg name="waypoint_file" default="$(arg waypoint_file)"/>
@@ -22,7 +29,11 @@
     </include>
 
     <group if="$(arg waypoint_marking)">
-        <include file="$(find waypoint_tools)/launch/waypoint_record.launch"/>
+        <include file="$(find waypoint_tools)/launch/waypoint_record.launch">
+            <arg name="offset_x" value="$(arg offset_x)"/>
+            <arg name="offset_y" value="$(arg offset_y)"/>
+            <arg name="offset_z" value="$(arg offset_z)"/>
+        </include>
     </group>
     <group unless="$(arg waypoint_marking)">
         <include file="$(find kcctcore)/launch/include/planner.launch">
@@ -35,8 +46,9 @@
         
     </group>
 
+<!--GPS mode ika huyou--><!--
     <include file="$(find kcctcore)/launch/include/rviz.launch">
         <arg name="map_2d" default="$(arg map_2d)" />
         <arg name="waypoint_marking" default="$(arg waypoint_marking)" />
-    </include>
+    </include>-->
 </launch>

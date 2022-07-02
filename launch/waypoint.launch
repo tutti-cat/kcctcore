@@ -2,5 +2,7 @@
 	<arg name="waypoint_marking" default="true"/>
     <include file="$(find kcctcore)/launch/kcctcore_master.launch">
         <arg name="waypoint_marking" default="$(arg waypoint_marking)"/>
+        
     </include>
+
 </launch>
