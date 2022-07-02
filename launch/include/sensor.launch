@@ -18,8 +18,7 @@
 
 
     <group unless="$(arg sim)">
-        <!--<node pkg="tf" type="static_transform_publisher" name="imu_transform" args="0 0 0 -1.570796 0 3.14159265 base_link imu_link 100"/>-->
-		<node pkg="tf" type="static_transform_publisher" name="imu_transform" args="0 0 0 0 0 0 base_link imu_link 100"/>
+        
 		<node name="serial_node"        pkg="rosserial_python"      type="serial_node.py">
 			<param name="port"              type="string"               value="/dev/teensy"/>
 			<param name="baud"              type="int"                  value="57600"/>
@@ -27,11 +26,21 @@
 			
 			<include file="$(find kcctcore)/launch/sensor/hokuyo/hokuyo_urg_single.launch"/>
 			<include file="$(find kcctcore)/launch/sensor/velodyne/velodyne.launch"/>
-			<node pkg="kcctcore" type="robot_model_node" name="robot_model_node" output="screen"/>
+			<include file="$(find kcctcore)/launch/include/robot_model.launch"/>
+
 			<node name="teensy_handler" pkg="kcctcore" type="teensy_handler">
 				<param name="tf_publish" value="$(arg tf_publish)" />
 			</node>
+			<!--
+			<node name="uvc_camera_node" pkg="uvc_camera" type="uvc_camera_node" >
+				<remap from="image_raw" to="image_raw"/>
+				<param name="device" value="/dev/video4" />
+			</node>
+			-->
 		<!--<include file="$(find kcctcore)/launch/sensor/ublox/gnss.launch"/>-->
     </group>
+
+	<!--laserscanをpointcloud2に変換して配信-->
+	<node pkg="kcctcore" name="laser2pc" type="laser2pc" output="screen" />
 
 </launch>
